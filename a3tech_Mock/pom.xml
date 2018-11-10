@@ -3,7 +3,7 @@
   <groupId>test.mock.services</groupId>
   <artifactId>a3tech_Mock</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <packaging>war</packaging>
+  <packaging>jar</packaging>
 
     
     <parent>

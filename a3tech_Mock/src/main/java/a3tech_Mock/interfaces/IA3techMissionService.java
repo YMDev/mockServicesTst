@@ -1,7 +1,5 @@
 package a3tech_Mock.interfaces;
 
-import java.util.List;
-
 import a3tech_Mock.A3techMission;
 
 public interface IA3techMissionService {
@@ -12,4 +10,7 @@ public interface IA3techMissionService {
     String deleteMission(String identifiant,  String idUser,String password);
 
     A3techMission updateMission(String mission);
+    Double calculeMontantMission(String mission);
+     String calculeDureeMission(String mission);
+     String missionCanBeReportedOrCanceled(String mission);
 }

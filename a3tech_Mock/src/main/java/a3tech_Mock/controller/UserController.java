@@ -1,28 +1,34 @@
-package a3tech_Mock;
+package a3tech_Mock.controller;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
+import org.springframework.cglib.core.Predicate;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
+import a3tech_Mock.A3techUser;
+import a3tech_Mock.Categorie;
 import a3tech_Mock.interfaces.EducationException;
 import a3tech_Mock.interfaces.IA3techUserService;
 
 @Controller
 public class UserController implements IA3techUserService {
-	@RequestMapping(method = RequestMethod.POST, value = "/student/allstudent")
+	@RequestMapping(method = RequestMethod.POST, value = "/user/allusers")
 	@ResponseBody
-	public String getAllStudents(@RequestParam("start") String start, @RequestParam("end") String end ) {
+	public String getAllUsers(@RequestParam("start") String start, @RequestParam("end") String end ) {
 		 Type listType = new TypeToken<List<A3techUser>>(){}.getType();
 		 System.out.println(start);
 		 System.out.println(end);
@@ -45,7 +51,7 @@ public class UserController implements IA3techUserService {
 
     public List<A3techUser> getTechnicienNearLocation(String latitude, String longitude, String ville)  {
         List<A3techUser> listeRetour = new ArrayList<A3techUser>();
-        A3techUser ss= getUserMocked("YASMINE", "SMMSMMM");
+        A3techUser ss= getUserMocked("SOBAAI", "AHMED");
         ss.setId(99999999L);
         listeRetour.add(ss);
         listeRetour.add(getUserMocked("BOUHJRA", "Mouad"));
@@ -248,6 +254,10 @@ public class UserController implements IA3techUserService {
 
         listeRetour.get(7).setLatitude(34.263727);
         listeRetour.get(7).setLongitude(-6.565619);
+        
+
+        listeRetour.get(8).setLatitude(34.0132500);
+        listeRetour.get(8).setLongitude(-6.8325500);
         return listeRetour;
     }
 
@@ -255,7 +265,7 @@ public class UserController implements IA3techUserService {
     private A3techUser getUserMocked(String name, String pname) {
     	A3techUser userMocked = new A3techUser();
         userMocked.setEmail("hahhsas@mail.com");
-        userMocked.setAdresse(index+"");
+        userMocked.setAdresse("Hay Ryad Av. Ennakhil, Rabat N°32");
         userMocked.setTelephone("02922029292");
         userMocked.setDateCreation(new Date().getTime());
         userMocked.setDateNaissance(new Date().getTime());
@@ -271,6 +281,8 @@ public class UserController implements IA3techUserService {
         userMocked.setNbrReview(rand.nextInt(15));
         userMocked.setLatitude(34.267471);
         userMocked.setLongitude(-6.562630);
+        userMocked.setCategorie(new Categorie());
+        userMocked.getCategorie().setDescription("Climatisation");
         index= index+1;
         return userMocked;
     }
@@ -312,12 +324,13 @@ public class UserController implements IA3techUserService {
 		// TODO Auto-generated method stub
 		return getUserMocked("BOUHJRA", "Mouad");
 	}
-
-
-	public A3techUser createAccount(String nom, String prenom, String email, String password, String image,
-			String regId, String pseudo) throws EducationException {
+ 
+	@RequestMapping(method = RequestMethod.POST, value = "/user/createAccount")
+	@ResponseBody
+	public A3techUser createAccount(@RequestParam("nom") String nom, @RequestParam("prenom") String prenom, @RequestParam("email") String email, @RequestParam("password") String password, @RequestParam("image") String image,
+			@RequestParam("regId") String regId, @RequestParam("pseudo") String pseudo) throws EducationException {
 		// TODO Auto-generated method stub
-		return null;
+		return getUserMocked("BOUHJRA", "Mouad");
 	}
 
 
@@ -385,6 +398,61 @@ public class UserController implements IA3techUserService {
 		System.out.println("tech ID "+TechId);
 		System.out.println("ezs ID "+new Long(99999999).equals(TechId));
 		return new Long(99999999).equals(TechId);
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/user/fetchSoldeDisponible")
+	@ResponseBody
+	public String fetchSoldeDisponible(@RequestParam("userID") Long userID) throws EducationException {
+		
+		try {
+			Thread.sleep(1000);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		if(userID.equals(99999999L)) {
+			Gson ss = new Gson();
+			JsonObject jj = new JsonObject();
+			jj.addProperty("result", 3299);
+			return jj.toString();
+		}
+		Gson ss = new Gson();
+		JsonObject jj = new JsonObject();
+		jj.addProperty("result", 654);
+		return jj.toString();
+	}
+
+
+	@SuppressWarnings("unchecked")
+	@Override
+	@RequestMapping(method = RequestMethod.POST, value = "/user/fetchTechniciens")
+	@ResponseBody
+	public String fetchTechnicien(@RequestParam("keyword") String keyword, @RequestParam("start")  int start,@RequestParam("end")  int end) throws EducationException {
+		 Type listType = new TypeToken<List<A3techUser>>(){}.getType();
+		 System.out.println(keyword +".."+start+".."+end);
+		 index = 0;
+		List<A3techUser> liste  =  getTechnicienNearLocation(null, null, null);
+		liste = (List<A3techUser>) org.springframework.cglib.core.CollectionUtils.filter(liste, new Predicate() {
+			
+			@Override
+			public boolean evaluate(Object arg0) {
+				A3techUser user = (A3techUser) arg0;
+				if(user != null && user.getNom() != null) {
+					return user.getNom().contains(keyword);
+				}
+				return false;
+			}
+		});
+		if(liste.size() >  Integer.valueOf(end) && liste.size() >  Integer.valueOf(start)) {
+			List<A3techUser> res = liste.subList(Integer.valueOf(start), Integer.valueOf(end));
+			return new Gson().toJson(res,listType);
+		}else if(liste.size() >  Integer.valueOf(start)){
+			List<A3techUser> res = liste.subList(Integer.valueOf(start), liste.size());
+			return new Gson().toJson(res,listType);
+		}else {
+			 System.out.println("nulll");
+			return null;
+		}
+		
 	}
 
 }

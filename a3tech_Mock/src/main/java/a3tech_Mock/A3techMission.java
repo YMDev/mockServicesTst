@@ -19,7 +19,7 @@ public class A3techMission {
     private Categorie categoryMission;
     private A3techUser technicien;
     private String descriptionMission;
-
+    private List<A3techEvenementiMission> evenement;
     public A3techMission() {
     }
 
@@ -121,6 +121,13 @@ public class A3techMission {
 
     public String getDescriptionMission() {
         return descriptionMission;
+    }
+    public List<A3techEvenementiMission> getEvenement() {
+        return evenement;
+    }
+
+    public void setEvenement(List<A3techEvenementiMission> evenement) {
+        this.evenement = evenement;
     }
 
 
